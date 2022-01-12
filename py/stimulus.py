@@ -23,6 +23,7 @@ for color in ["red", "blue"]:
             win=window,
             pos=[rand_x(), rand_y()],
             radius=0.5,
+            contrast=0.7,
             fillColor=color)
         draw_if_possible(circ)
     for j in range(random.randint(2, 4)):
@@ -30,6 +31,7 @@ for color in ["red", "blue"]:
             win=window,
             pos=[rand_x(), rand_y()],
             size=1,
+            contrast=0.7,
             fillColor=color)
         draw_if_possible(rect)
 
