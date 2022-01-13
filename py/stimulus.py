@@ -40,7 +40,11 @@ for item in polys:
 window.update()
 core.wait(0.5)
 
+## Left-to-right attention
+# polys.sort(key = lambda S: S.pos[0])
+## Random order attention
 random.shuffle(polys)
+
 for i, _ in enumerate(polys):
     for item in polys:
         item.draw()
