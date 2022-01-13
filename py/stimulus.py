@@ -4,6 +4,15 @@ from psychopy import core, event, visual
 
 # https://www.psychopy.org/coder/tutorial1.html
 
+######################
+#      CONFIGS       #
+######################
+
+RANDOM = False
+COLORS = ["red", "blue"]
+
+######################
+
 window = visual.Window([800,600], monitor="testMonitor", units="deg")
 
 random.seed()
@@ -17,7 +26,7 @@ def add_if_possible(item):
         item.draw()
         polys.append(item)
 
-for color in ["red", "blue"]:
+for color in COLORS:
     for i in range(random.randint(2, 4)):
         circ = visual.Circle(
             win=window,
@@ -40,10 +49,12 @@ for item in polys:
 window.update()
 core.wait(0.5)
 
-## Left-to-right attention
-# polys.sort(key = lambda S: S.pos[0])
-## Random order attention
-random.shuffle(polys)
+if RANDOM:
+    ## Random order attention
+    random.shuffle(polys)
+else:
+    ## Left-to-right attention
+    polys.sort(key = lambda S: S.pos[0])
 
 for i, _ in enumerate(polys):
     for item in polys:
