@@ -8,8 +8,9 @@ from psychopy import core, event, visual
 #      CONFIGS       #
 ######################
 
-RANDOM = False
-COLORS = ["red", "blue"]
+RANDOM      = False
+COLORS      = ["red", "blue"]
+ANIMATE     = False
 
 ######################
 
@@ -20,6 +21,9 @@ rand_x = lambda: random.randint(-10, 10)
 rand_y = lambda: random.randint(-5, 5)
 
 polys = []
+start_contrast = 0.2
+if not ANIMATE:
+    start_contrast = 0.7
 
 def add_if_possible(item):
     if all (not item.overlaps(poly) for poly in polys):
@@ -32,7 +36,7 @@ for color in COLORS:
             win=window,
             pos=[rand_x(), rand_y()],
             radius=0.5,
-            contrast=0.2,
+            contrast=start_contrast,
             fillColor=color)
         add_if_possible(circ)
     for j in range(random.randint(2, 4)):
@@ -40,7 +44,7 @@ for color in COLORS:
             win=window,
             pos=[rand_x(), rand_y()],
             size=1,
-            contrast=0.2,
+            contrast=start_contrast,
             fillColor=color)
         add_if_possible(rect)
 
@@ -48,6 +52,10 @@ for item in polys:
     item.draw()
 window.update()
 core.wait(0.5)
+
+if not ANIMATE:
+    core.wait(2.0)
+    exit()
 
 if RANDOM:
     ## Random order attention
