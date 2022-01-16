@@ -4,3 +4,5 @@ code/.DS_Store
 .DS_Store
 temp/
 code/dist
+code/cabal.project.local
+code/dist-newstyle
