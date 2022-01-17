@@ -8,7 +8,7 @@ from psychopy import core, event, visual
 #      CONFIGS       #
 ######################
 
-ATTN        = True
+ATTN        = False
 ITERATIONS  = 10
 
 ######################
