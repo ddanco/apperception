@@ -1,5 +1,7 @@
 module Main where
 
+import Interpretation
+
 frame_attn_1 :: Frame
 frame_attn_1 = Frame {
     types = [T "sensor_1", T "cell", T "grid", T "object"],
@@ -43,5 +45,5 @@ template_attn_1 = Template {
     num_arrow_rules = 0,
     num_causes_rules = 2,
     num_visual_predicates = Nothing,
-    use_noise = False,
+    use_noise = False
 }
