@@ -11,6 +11,7 @@ misc_templates = [
     ("predict_2.lp", ("data/misc", template_misc_2_1, "predict_2.lp")),
     ("predict_3.lp", ("data/misc", template_misc_3_1, "predict_3.lp")),
     ("predict_4.lp", ("data/misc", template_misc_4_1, "predict_4.lp")),
+    ("predict_5.lp", ("data/misc", template_misc_5_1, "predict_5.lp")),
     ("predict_example.lp", ("data/misc", template_misc_4_mislabel, "predict_example.lp")),
     ("predict_mislabel.lp", ("data/misc", template_misc_4_mislabel, "predict_mislabel.lp")),
     ("exog_1.lp", ("data/misc", template_exog_1, "exog_1.lp")),
@@ -205,30 +206,45 @@ template_misc_4_1 = Template {
     use_noise = False
     }   
 
-frame_misc_5_1 :: Frame    
+frame_misc_5_1 :: Frame
 frame_misc_5_1 = Frame {
-    types = [T "object"],
-    type_hierarchy = [],
+    types = [T "sensor_1", T "sensor_2", T "cell", T "grid", T "object"],
+    type_hierarchy = [
+        (T "object", [T "cell", T "grid"]),
+        (T "cell", [T "sensor_1", T "sensor_2"])
+        ],
     objects = [
-        (O "sensor_a", T "object")
+        (O "sensor_a_1", T "sensor_1"),
+        (O "sensor_b_1", T "sensor_1"),
+        (O "sensor_a_2", T "sensor_2"),
+        (O "sensor_b_2", T "sensor_2"),
+        (O "grid", T "grid")
         ],
     exogeneous_objects = [],
     permanent_concepts = [],
     fluid_concepts = [
-        (C "on", [T "object"]), 
-        (C "off", [T "object"]),
-        (C "a", [T "object"]),
-        (C "b", [T "object"]),
-        (C "c", [T "object"]),
-        (C "d", [T "object"])
+        (C "on", [T "sensor_1"]), 
+        (C "off", [T "sensor_1"]),
+        (C "a", [T "sensor_2"]),
+        (C "b", [T "sensor_2"]),
+        (C "c", [T "sensor_2"]),
+        (C "part", [T "cell", T "grid"])
         ],
-    input_concepts = [C "on", C "off"],
+    input_concepts = [C "on", C "off", C "a", C "b", C "c"],
     static_concepts = [],
     vars = [
+        (V "s1", T "sensor_1"),
+        (V "s2", T "sensor_2"),
+        (V "c", T "cell"),
+        (V "g", T "grid"),
         (V "x", T "object")
         ],
     var_groups = [
-        [V "x"]
+        [V "x"],
+        [V "s1"],
+        [V "s2"],
+        [V "c"],
+        [V "c", V "g"]
         ],
     aux_files = []
 }
@@ -236,14 +252,14 @@ frame_misc_5_1 = Frame {
 template_misc_5_1 :: Template
 template_misc_5_1 = Template {
     dir = "misc",
-    frame = frame_misc_5_1,
+    frame = frame_misc_2_1,
     min_body_atoms = 1,
-    max_body_atoms = 1, 
+    max_body_atoms = 2, -- ?? 
     num_arrow_rules = 0,
     num_causes_rules = 2,
     num_visual_predicates = Nothing,
     use_noise = False
-    }    
+}
 
 frame_exog_1 :: Frame    
 frame_exog_1 = Frame {
