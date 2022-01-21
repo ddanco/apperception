@@ -32,7 +32,7 @@ main = do
         ["sw", f] -> solve_sw_iteratively f 1
         ["sw", f, n] -> solve_sw_iteratively f (read n)
         ["nonstationary", f] -> solve_nonstationary_iteratively f
-        ["attention", f] -> solve_attn f
+        -- ["attention", f] -> solve_attn f
         ["eca", f] -> solve_eca_iteratively f
         ["eca-general", f] -> solve_eca_general f
         ["music", f] -> solve_music_iteratively f 

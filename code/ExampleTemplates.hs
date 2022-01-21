@@ -9,6 +9,7 @@ misc_templates :: [(String, (String, Template, String))]
 misc_templates = [
     ("predict_1.lp", ("data/misc", template_misc_1_1, "predict_1.lp")),
     ("predict_2.lp", ("data/misc", template_misc_2_1, "predict_2.lp")),
+    ("predict_2b.lp", ("data/misc", template_misc_2_2, "predict_2b.lp")),
     ("predict_3.lp", ("data/misc", template_misc_3_1, "predict_3.lp")),
     ("predict_4.lp", ("data/misc", template_misc_4_1, "predict_4.lp")),
     ("predict_5.lp", ("data/misc", template_misc_5_1, "predict_5.lp")),
@@ -112,7 +113,19 @@ template_misc_2_1 = Template {
     num_causes_rules = 2,
     num_visual_predicates = Nothing,
     use_noise = False
-    }    
+    }
+
+template_misc_2_2 :: Template
+template_misc_2_2 = Template {
+    dir = "misc",
+    frame = frame_misc_2_1,
+    min_body_atoms = 1,
+    max_body_atoms = 10,
+    num_arrow_rules = 0,
+    num_causes_rules = 4,
+    num_visual_predicates = Nothing,
+    use_noise = False
+    }
 
 frame_misc_3_1 :: Frame
 frame_misc_3_1 = Frame {
