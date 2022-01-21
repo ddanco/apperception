@@ -85,7 +85,7 @@ occlusion_task w t = comments w t ++ trajectory_text w t ++ elements_text w t ++
 comments :: World -> Int -> [String]
 comments w t = h ++ concat (map f ps) ++ [header, ""] where
     ps = zip [1..] traj
-    traj= take t (trajectory w)
+    traj = take t (trajectory w)
     h = [header, "% Auto-generated from Occlusion.hs", "%"]
     f (i, x) = ("% Time " ++ show i ++ ":") : map g (display_world x) ++ ["%"]
     g l = "% " ++ l
