@@ -14,22 +14,22 @@
 
 % The given sequence
 senses(s(c_on, obj_sensor_a), 1).
-senses(s(c_on, obj_sensor_b), 1).
+% senses(s(c_on, obj_sensor_b), 1).
 senses(s(c_off, obj_sensor_a), 2).
-senses(s(c_off, obj_sensor_b), 2).
+% senses(s(c_off, obj_sensor_b), 2).
 senses(s(c_on, obj_sensor_a), 3).
-senses(s(c_on, obj_sensor_b), 3).
+% senses(s(c_on, obj_sensor_b), 3).
 senses(s(c_off, obj_sensor_a), 4).
-senses(s(c_off, obj_sensor_b), 4).
+% senses(s(c_off, obj_sensor_b), 4).
 
-senses(s(c_a, obj_sensor_a), 1),
+% senses(s(c_a, obj_sensor_a), 1),
 senses(s(c_b, obj_sensor_b), 1),
-senses(s(c_a, obj_sensor_a), 2),
+% senses(s(c_a, obj_sensor_a), 2),
 senses(s(c_b, obj_sensor_b), 2),
-senses(s(c_a, obj_sensor_a), 3),
+% senses(s(c_a, obj_sensor_a), 3),
 senses(s(c_b, obj_sensor_b), 3),
-senses(s(c_a, obj_sensor_a), 4),
-senses(s(c_b, obj_sensor_b), 5),
+% senses(s(c_a, obj_sensor_a), 4),
+senses(s(c_b, obj_sensor_b), 4),
 
 % Elements
 is_object(obj_sensor_a).
