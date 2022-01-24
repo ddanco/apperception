@@ -14,6 +14,7 @@ import qualified System.Process as Process
 import Interpretation
 import ExampleTemplates
 import SolveTemplates
+import qualified AttentionData as AttentionData
 import qualified OcclusionData as OcclusionData
 import qualified WalkerData as WalkerData
 import qualified SokobanData as SokobanData
@@ -38,6 +39,7 @@ main = do
         ["music", f] -> solve_music_iteratively f 
         ["rhythm", f] -> solve_rhythm_iteratively f 
         ["misc", f] -> solve_misc f
+        ["attn", f] -> solve_attn f
         ["occlusion", f] -> solve_occlusion f
         ["walker", t, f] -> solve_walker t f
         ["binding", f] -> solve_binding f
@@ -64,6 +66,27 @@ solve_misc f = case lookup f misc_templates of
 
 process_misc :: String -> Template -> String -> IO ()
 process_misc dir t input_f = do
+    (results_f, ls2) <- do_solve dir input_f t
+    case ls2 of
+        [] -> do
+            putStrLn "No solution found."
+        _ -> do
+            let ans = last_answers ls2
+            Monad.forM_ ans (write_latex t)
+            let ls3 = map (process_answer_with_template t) ans
+            Monad.forM_ ls3 putStrLn
+
+-------------------------------------------------------------------------------
+-- Attention-specific solving
+-------------------------------------------------------------------------------
+
+solve_attn :: String -> IO ()
+solve_attn f = case lookup f AttentionData.attn_templates of
+    Nothing -> error $ "No misc template with this id: " ++ f
+    Just (dir, template, input) -> process_misc dir template input
+
+process_attn :: String -> Template -> String -> IO ()
+process_attn dir t input_f = do
     (results_f, ls2) <- do_solve dir input_f t
     case ls2 of
         [] -> do
