@@ -4,7 +4,7 @@
 %------------------------------------------------------------------------------
 
 %-----------------------------------------
-%   Time            Sensor a    Sensor b
+%   Time            Sensor a    //Sensor b
 %                            
 %   1               on          a         
 %   2               off         a         
@@ -20,6 +20,8 @@ senses(s(c_off, obj_sensor_a), 4).
 
 % Elements
 is_object(obj_sensor_a).
+is_concept(c_on).
+is_concept(c_off).
 is_time(1..4).
 
 % Input exclusions
@@ -30,15 +32,15 @@ is_time(1..4).
     holds(s(c_on, X), T),
     holds(s(c_off, X), T).
 
-% At least one  %
+% At least one
 :-
-    permanent(isa(t_sensor_1, X)),
+    permanent(isa(t_object, X)),
     is_time(T),
     not holds(s(c_on, X), T),
     not holds(s(c_off, X), T).
 
 % Incompossibility
 incompossible(s(c_on, X), s(c_off, X)) :-
-    permanent(isa(t_sensor_1, X)).
+    permanent(isa(t_object, X)).
 
 exclusion_output("c_on+c_off").

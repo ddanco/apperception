@@ -22,7 +22,7 @@ frame_attn_1 = Frame {
     fluid_concepts = [
         (C "on", [T "object"]),
         (C "off", [T "object"])
-        -- something about position?
+        -- future: something about position?
         ],
     input_concepts = [C "on", C "off"],
     static_concepts = [],
@@ -42,7 +42,7 @@ template_attn_1 = Template {
     min_body_atoms = 1,
     max_body_atoms = 1, -- ?
     num_arrow_rules = 0,
-    num_causes_rules = 4,
+    num_causes_rules = 2,
     num_visual_predicates = Nothing,
     use_noise = False
     }
