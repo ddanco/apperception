@@ -6,12 +6,12 @@ import System.IO
 
 type Trace = [TimeStep]
 
-data TimeStep = TimsStep {
-    id :: Int,
+data TimeStep = TimeStep {
+    time :: Int,
     readings :: [Reading]
 } -- deriving (Show, Data, Typeable)
 
-data Reading =  R {
+data Reading =  Reading {
     sensor :: String,
     value :: String
 } -- deriving (Show, Data, Typeable)
@@ -23,10 +23,54 @@ data CausalRule = CausalRule {
     end :: String
 }
 
-data ArrowRule = AR {
+data ArrowRule = ArrowRule {
     premise :: [String],
     conclusion :: String
 }
+
+-- ========================= Data ======================
+
+wiif_1 :: Trace
+wiif_1 = [
+    TimeStep {
+        time = 1,
+        readings = [Reading {sensor="light", value="on"}]
+    },
+    TimeStep {
+        time = 2,
+        readings = [Reading {sensor="light", value="on"}]
+    },
+    TimeStep {
+        time = 3,
+        readings = [Reading {sensor="light", value="on"}]
+    },
+    TimeStep {
+        time = 4,
+        readings = [Reading {sensor="light", value="on"}]
+    },
+    TimeStep {
+        time = 5,
+        readings = [Reading {sensor="light", value="on"}]
+    },
+    TimeStep {
+        time = 6,
+        readings = [Reading {sensor="light", value="on"}]
+    }]
+
+causal_rule_1 :: CausalRule
+causal_rule_1 = CausalRule {
+    start = "on",
+    end = "off"
+}
+
+causal_rule_2 :: CausalRule
+causal_rule_2 = CausalRule {
+    start = "on",
+    end = "on"
+}
+
+
+-- =====================================================
 
 -- data Rule = CausalRule | ArrowRule
 -- data Rule = CausalRule String String |
@@ -84,19 +128,19 @@ causal_rules_valid t (x:xs) = causal_rule_valid t x &&
 
 ----------------------- Main --------------------------
 
-readTraceFile :: IO ()
-readTraceFile = do
-    handle <- openFile "wiif/data/wiif_1_trace.json" ReadMode
-    contents <- hGetContents handle
-    putStr contents
-    hClose handle
 
 main :: IO ()
 main = do
     args <- getArgs
     case args of
         [trace, target] -> do
-            readTraceFile;
-            putStrLn $ "Yay"
+            -- contents <- readFile trace
+            -- putStrLn $ contents
+            let trace = wiif_1
+            let causal_rules = [causal_rule_2]
+            if causal_rules_valid trace causal_rules then
+                putStrLn $ "Causal rules valid"
+            else putStrLn $ "Causal rules invalid"
+            
         _ -> do
             putStrLn $ "Usage: wiif <trace-file> <target-file>"
