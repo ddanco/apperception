@@ -1,18 +1,20 @@
 module Main where
 
 import System.Environment
+import System.IO
+-- import Text.JSON.Generic
 
 type Trace = [TimeStep]
 
-data TimeStep = TS {
+data TimeStep = TimsStep {
     id :: Int,
     readings :: [Reading]
-}
+} -- deriving (Show, Data, Typeable)
 
 data Reading =  R {
     sensor :: String,
     value :: String
-}
+} -- deriving (Show, Data, Typeable)
 
 data CausalRule = CausalRule {
     -- Conditions e.g. "on" "off",
@@ -82,11 +84,19 @@ causal_rules_valid t (x:xs) = causal_rule_valid t x &&
 
 ----------------------- Main --------------------------
 
+readTraceFile :: IO ()
+readTraceFile = do
+    handle <- openFile "wiif/data/wiif_1_trace.json" ReadMode
+    contents <- hGetContents handle
+    putStr contents
+    hClose handle
+
 main :: IO ()
 main = do
     args <- getArgs
     case args of
         [trace, target] -> do
+            readTraceFile;
             putStrLn $ "Yay"
         _ -> do
             putStrLn $ "Usage: wiif <trace-file> <target-file>"
