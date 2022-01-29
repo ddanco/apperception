@@ -9,19 +9,19 @@ type Trace = [TimeStep]
 data TimeStep = TimeStep {
     time :: Int,
     readings :: [Reading]
-} -- deriving (Show, Data, Typeable)
+} deriving (Eq, Show) -- deriving (Show, Data, Typeable)
 
 data Reading =  Reading {
     sensor :: String,
     value :: String
-} deriving (Eq, Show)-- deriving (Show, Data, Typeable)
+} deriving (Eq, Show) -- deriving (Show, Data, Typeable)
 
 data CausalRule = CausalRule {
     -- Conditions e.g. "on" "off",
     -- Maybe make datatype more sophisticated
     start :: String,
     end :: String
-}
+} deriving (Eq, Show)
 
 data ArrowRule = ArrowRule {
     premises :: [Reading],
@@ -123,6 +123,22 @@ causal_rule_valid (x:(y:ys)) r =
 -- For now, for simplicity, yes.
 causal_rule_valid _ _ = True
 
+s_causal_rule_valid :: Trace -> CausalRule -> IO ()
+s_causal_rule_valid (x:(y:ys)) r =
+    case relevant_sensor (readings x) r of
+        Just v -> do
+            if not (causal_step_valid r v y) then putStrLn $ "NOT VALID: " ++ (show r) ++ " between timesteps\n" ++ (show x) ++ "\n and\n" ++ (show y)
+            else s_causal_rule_valid (y:ys) r
+        Nothing -> s_causal_rule_valid (y:ys) r
+-- Do we want a trace of len 1 to pass a causal rule? Loop around?
+-- For now, for simplicity, yes.
+s_causal_rule_valid _ _ = putStrLn $ "done.."
+
+s_causal_rules_valid :: Trace -> [CausalRule] -> IO ()
+s_causal_rules_valid t [] = putStrLn $ "Done"
+s_causal_rules_valid t (x:xs) = s_causal_rule_valid t x >>
+                                    s_causal_rules_valid t xs
+
 causal_rules_valid :: Trace -> [CausalRule] -> Bool
 causal_rules_valid t [] = True
 causal_rules_valid t (x:xs) = causal_rule_valid t x &&
@@ -178,9 +194,10 @@ main = do
 
 test_causal_rules :: Trace -> [CausalRule] -> IO ()
 test_causal_rules t cs =
-    if causal_rules_valid t cs then
-        putStrLn $ "Causal rules valid"
-    else putStrLn $ "Causal rules invalid"
+    -- if causal_rules_valid t cs then
+    --     putStrLn $ "Causal rules valid"
+    -- else putStrLn $ "Causal rules invalid"
+    s_causal_rules_valid t cs
 
 test_arrow_rules :: Trace -> [ArrowRule] -> IO ()
 test_arrow_rules t as =
