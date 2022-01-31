@@ -19,8 +19,8 @@ data Reading =  Reading {
 data CausalRule = CausalRule {
     -- Conditions e.g. "on" "off",
     -- Maybe make datatype more sophisticated
-    start :: String,
-    end :: String
+    start :: Reading,
+    end :: Reading
 } deriving (Eq, Show)
 
 data ArrowRule = ArrowRule {
@@ -61,7 +61,7 @@ wiif_predict_1 = [
     }]
 
 wiif_exog_1_wrong :: Trace
-wiif_exog_1 = [
+wiif_exog_1_wrong = [
     TimeStep {
         time = 1,
         readings = [Reading {sensor="obj_1", value="off"},
@@ -142,10 +142,10 @@ wiif_exog_1 = [
         readings = [Reading {sensor="obj_1", value="off"},
                     Reading {sensor="exog", value="noop"}]
     }
-]
+    ]
 
 wiif_exog_1_correct :: Trace
-wiif_exog_1 = [
+wiif_exog_1_correct = [
     TimeStep {
         time = 1,
         readings = [Reading {sensor="obj_1", value="off"},
@@ -226,19 +226,19 @@ wiif_exog_1 = [
         readings = [Reading {sensor="obj_1", value="off"},
                     Reading {sensor="exog", value="noop"}]
     }
-]
+    ]
 
-causal_rule_predict_1_1 :: CausalRule
-causal_rule_predict_1_1 = CausalRule {
-    start = "on",
-    end = "on"
-}
+-- causal_rule_predict_1_1 :: CausalRule
+-- causal_rule_predict_1_1 = CausalRule {
+--     start = "on",
+--     end = "on"
+-- }
 
-causal_rule_predict_1_2 :: CausalRule
-causal_rule_predict_1_2 = CausalRule {
-    start = "on",
-    end = "off"
-}
+-- causal_rule_predict_1_2 :: CausalRule
+-- causal_rule_predict_1_2 = CausalRule {
+--     start = "on",
+--     end = "off"
+-- }
 
 arrow_rule_predict_1_1 :: ArrowRule
 arrow_rule_predict_1_1 = ArrowRule {
@@ -252,6 +252,12 @@ arrow_rule_predict_1_2 = ArrowRule {
     conclusion = Reading {sensor="intensity", value="bright"}
 }
 
+causal_rule_exog_1_1 :: CausalRule
+causal_rule_exog_1_1 = CausalRule {
+    start = Reading {sensor="exog", value="bong"},
+    end = Reading {sensor="obj_a", value="on"}
+}
+
 -- =====================================================
 
 -- data Rule = CausalRule | ArrowRule
@@ -260,56 +266,56 @@ arrow_rule_predict_1_2 = ArrowRule {
 
 type Sensor = String -- Maybe overkill.
 
-relevant_reading :: [Reading] -> Sensor -> Maybe Reading
-relevant_reading [] _ = Nothing
--- We only take the first reading that matches. There shouldn't be
--- multiple different readings for one sensor at same timestamp.
--- Future: validate this in code.
-relevant_reading (x:xs) v = if sensor x == v then Just x
-                            else relevant_reading xs v
+-- relevant_reading :: [Reading] -> Sensor -> Maybe Reading
+-- relevant_reading [] _ = Nothing
+-- -- We only take the first reading that matches. There shouldn't be
+-- -- multiple different readings for one sensor at same timestamp.
+-- -- Future: validate this in code.
+-- relevant_reading (x:xs) v = if sensor x == v then Just x
+--                             else relevant_reading xs v
 
-relevant_sensor :: [Reading] -> CausalRule -> Maybe Sensor
-relevant_sensor [] _ = Nothing
--- Same deal here, assuming there's only one reading for a given sensor.
--- Should do validation separately.
-relevant_sensor (x:xs) r =  if value x == start r then Just (sensor x)
-                            else relevant_sensor xs r
+-- relevant_sensor :: [Reading] -> CausalRule -> Maybe Sensor
+-- relevant_sensor [] _ = Nothing
+-- -- Same deal here, assuming there's only one reading for a given sensor.
+-- -- Should do validation separately.
+-- relevant_sensor (x:xs) r =  if value x == start r then Just (sensor x)
+--                             else relevant_sensor xs r
 
-causal_step_valid :: CausalRule -> Sensor -> TimeStep -> Bool
-causal_step_valid rule v t =
-    case relevant_reading (readings t) v of
-        Just reading -> end rule == (value reading)
-        Nothing -> False
+-- causal_step_valid :: CausalRule -> Sensor -> TimeStep -> Bool
+-- causal_step_valid rule v t =
+--     case relevant_reading (readings t) v of
+--         Just reading -> end rule == (value reading)
+--         Nothing -> False
 
-causal_rule_valid :: Trace -> CausalRule -> Bool
-causal_rule_valid (x:(y:ys)) r =
-    case relevant_sensor (readings x) r of
-        Just v -> do
-            causal_step_valid r v y && causal_rule_valid (y:ys) r
-        Nothing -> causal_rule_valid (y:ys) r
--- Do we want a trace of len 1 to pass a causal rule? Loop around?
--- For now, for simplicity, yes.
-causal_rule_valid _ _ = True
+-- causal_rule_valid :: Trace -> CausalRule -> Bool
+-- causal_rule_valid (x:(y:ys)) r =
+--     case relevant_sensor (readings x) r of
+--         Just v -> do
+--             causal_step_valid r v y && causal_rule_valid (y:ys) r
+--         Nothing -> causal_rule_valid (y:ys) r
+-- -- Do we want a trace of len 1 to pass a causal rule? Loop around?
+-- -- For now, for simplicity, yes.
+-- causal_rule_valid _ _ = True
 
-s_causal_rule_valid :: Trace -> CausalRule -> IO ()
-s_causal_rule_valid (x:(y:ys)) r =
-    case relevant_sensor (readings x) r of
-        Just v -> do
-            if not (causal_step_valid r v y) then putStrLn $ "NOT VALID: " ++ (show r) ++ " between timesteps\n" ++ (show x) ++ "\n and\n" ++ (show y)
-            else s_causal_rule_valid (y:ys) r
-        Nothing -> s_causal_rule_valid (y:ys) r
--- Do we want a trace of len 1 to pass a causal rule? Loop around?
--- For now, for simplicity, yes.
-s_causal_rule_valid _ _ = putStrLn $ "done.."
+-- s_causal_rule_valid :: Trace -> CausalRule -> IO ()
+-- s_causal_rule_valid (x:(y:ys)) r =
+--     case relevant_sensor (readings x) r of
+--         Just v -> do
+--             if not (causal_step_valid r v y) then putStrLn $ "NOT VALID: " ++ (show r) ++ " between timesteps\n" ++ (show x) ++ "\n and\n" ++ (show y)
+--             else s_causal_rule_valid (y:ys) r
+--         Nothing -> s_causal_rule_valid (y:ys) r
+-- -- Do we want a trace of len 1 to pass a causal rule? Loop around?
+-- -- For now, for simplicity, yes.
+-- s_causal_rule_valid _ _ = putStrLn $ "done.."
 
-s_causal_rules_valid :: Trace -> [CausalRule] -> IO ()
-s_causal_rules_valid t [] = putStrLn $ "Done"
-s_causal_rules_valid t (x:xs) = s_causal_rule_valid t x >>
-                                    s_causal_rules_valid t xs
+-- s_causal_rules_valid :: Trace -> [CausalRule] -> IO ()
+-- s_causal_rules_valid t [] = putStrLn $ "Done"
+-- s_causal_rules_valid t (x:xs) = s_causal_rule_valid t x >>
+--                                     s_causal_rules_valid t xs
 
 causal_rules_valid :: Trace -> [CausalRule] -> Bool
 causal_rules_valid t [] = True
-causal_rules_valid t (x:xs) = causal_rule_valid t x &&
+causal_rules_valid t (x:xs) = causal_rule_valid_2 t x &&
                                 causal_rules_valid t xs
 
 arrow_rule_valid :: Trace -> ArrowRule -> Bool
@@ -323,6 +329,12 @@ arrow_rules_valid :: Trace -> [ArrowRule] -> Bool
 arrow_rules_valid t [] = True
 arrow_rules_valid t (x:xs) = arrow_rule_valid t x &&
                                 arrow_rules_valid t xs
+
+causal_rule_valid_2 :: Trace -> CausalRule -> Bool
+causal_rule_valid_2 (x:(y:ys)) r =
+    if (start r) `elem` (readings x) then
+        (end r) `elem` (readings y) && causal_rule_valid_2 (y:ys) r
+    else causal_rule_valid_2 ys r
 
 -----------------------------------------------
 --------- Can't get Rule type properly working
@@ -346,26 +358,34 @@ main = do
         [trace, target] -> do
             -- contents <- readFile trace
             -- putStrLn $ contents
-            let should_pass = False
-            let trace = wiif_predict_1
+            let should_pass = True
+            -- let trace = wiif_predict_1
+            -- if should_pass then do
+            --     let causal_rules = [causal_rule_predict_1_2]
+            --     let arrow_rules = [arrow_rule_predict_1_2]
+            --     test_rules trace causal_rules arrow_rules
+            -- else do
+            --     let causal_rules = [causal_rule_predict_1_1]
+            --     let arrow_rules = [arrow_rule_predict_1_1]
+            --     test_rules trace causal_rules arrow_rules
+
+            let causal_rules = [causal_rule_exog_1_1]
             if should_pass then do
-                let causal_rules = [causal_rule_predict_1_2]
-                let arrow_rules = [arrow_rule_predict_1_2]
-                test_rules trace causal_rules arrow_rules
+                let trace = wiif_exog_1_correct
+                test_rules trace causal_rules []
             else do
-                let causal_rules = [causal_rule_predict_1_1]
-                let arrow_rules = [arrow_rule_predict_1_1]
-                test_rules trace causal_rules arrow_rules
+                let trace = wiif_exog_1_wrong
+                test_rules trace causal_rules []
         _ -> do
             putStrLn $ "Usage: wiif <trace-file> <target-file>"
 
 
 test_causal_rules :: Trace -> [CausalRule] -> IO ()
 test_causal_rules t cs =
-    -- if causal_rules_valid t cs then
-    --     putStrLn $ "Causal rules valid"
-    -- else putStrLn $ "Causal rules invalid"
-    s_causal_rules_valid t cs
+    if causal_rules_valid t cs then
+        putStrLn $ "Causal rules valid"
+    else putStrLn $ "Causal rules invalid"
+    -- s_causal_rules_valid t cs
 
 test_arrow_rules :: Trace -> [ArrowRule] -> IO ()
 test_arrow_rules t as =
