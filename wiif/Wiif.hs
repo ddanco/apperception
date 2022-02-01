@@ -23,6 +23,10 @@ data CausalRule = CausalRule {
     end :: Reading
 } deriving (Eq, Show)
 
+print_causal_rule :: CausalRule -> String
+print_causal_rule r = "s(" ++ (show (value (start r))) ++ ",var x) >> " ++
+                        "s(" ++ (show (value (end r))) ++ ",var x)"
+
 data ArrowRule = ArrowRule {
     premises :: [Reading],
     conclusion :: Reading
@@ -64,83 +68,83 @@ wiif_exog_1_wrong :: Trace
 wiif_exog_1_wrong = [
     TimeStep {
         time = 1,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 2,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 3,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 4,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 5,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 6,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="bong"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_bong"}]
     },
     TimeStep {
         time = 7,
-        readings = [Reading {sensor="obj_1", value="on"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 8,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 9,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 10,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 11,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="bong"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_bong"}]
     },
     TimeStep {
         time = 12,
-        readings = [Reading {sensor="obj_1", value="on"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_on"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 13,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="bong"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_bong"}]
     },
     TimeStep {
         time = 14,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_on"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 15,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 16,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     }
     ]
 
@@ -148,83 +152,83 @@ wiif_exog_1_correct :: Trace
 wiif_exog_1_correct = [
     TimeStep {
         time = 1,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 2,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 3,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 4,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 5,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 6,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="bong"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_bong"}]
     },
     TimeStep {
         time = 7,
-        readings = [Reading {sensor="obj_1", value="on"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_on"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 8,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 9,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 10,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 11,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="bong"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_bong"}]
     },
     TimeStep {
         time = 12,
-        readings = [Reading {sensor="obj_1", value="on"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_on"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 13,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="bong"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_bong"}]
     },
     TimeStep {
         time = 14,
-        readings = [Reading {sensor="obj_1", value="on"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_on"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 15,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     },
     TimeStep {
         time = 16,
-        readings = [Reading {sensor="obj_1", value="off"},
-                    Reading {sensor="exog", value="noop"}]
+        readings = [Reading {sensor="obj_1", value="c_off"},
+                    Reading {sensor="exog", value="c_noop"}]
     }
     ]
 
@@ -254,8 +258,8 @@ arrow_rule_predict_1_2 = ArrowRule {
 
 causal_rule_exog_1_1 :: CausalRule
 causal_rule_exog_1_1 = CausalRule {
-    start = Reading {sensor="exog", value="bong"},
-    end = Reading {sensor="obj_a", value="on"}
+    start = Reading {sensor="exog", value="c_bong"},
+    end = Reading {sensor="obj_a", value="c_on"}
 }
 
 -- =====================================================
@@ -305,7 +309,7 @@ check_causal_rule :: Trace -> CausalRule -> IO ()
 check_causal_rule (x:(y:ys)) r =
     if (start r) `elem` (readings x) then
         if not ((end r) `elem` (readings y)) then
-            putStrLn $ "NOT VALID: " ++ (show r) ++ " between timesteps " ++ (show (time x)) ++ " and " ++ (show (time y))
+            putStrLn $ "NOT VALID: " ++ (print_causal_rule r) ++ " between timesteps " ++ (show (time x)) ++ " and " ++ (show (time y))
         else check_causal_rule (y:ys) r
     else check_causal_rule (y:ys) r
 -- Do we want a trace of len 1 to pass a causal rule? Loop around?
