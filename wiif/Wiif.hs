@@ -15,7 +15,7 @@ check_causal_rule :: Trace -> CausalRule -> IO ()
 check_causal_rule (x:(y:ys)) r =
     if (start r) `elem` (readings x) then
         if not ((end r) `elem` (readings y)) then
-            putStrLn $ " # RULE INVALID: " ++ (print_causal_rule r) ++
+            putStrLn $ "# RULE INVALID: " ++ (print_causal_rule r) ++
                         " between timesteps " ++ (show (time x)) ++
                         " and " ++ (show (time y))
         else check_causal_rule (y:ys) r
@@ -148,42 +148,74 @@ main = do
     case args of
         -- verbosity argument?
         [trace, target] -> do
+            -- TODO: Add file support
             -- contents <- readFile trace
             -- putStrLn $ contents
-            let should_pass = True
-            -- let trace = wiif_predict_1
-            -- if should_pass then do
-            --     let causal_rules = [causal_rule_predict_1_2]
-            --     let arrow_rules = [arrow_rule_predict_1_2]
-            --     test_rules trace causal_rules arrow_rules
-            -- else do
-            --     let causal_rules = [causal_rule_predict_1_1]
-            --     let arrow_rules = [arrow_rule_predict_1_1]
-            --     test_rules trace causal_rules arrow_rules
-
-            let causal_rules = [causal_rule_exog_1_2]
-            if should_pass then do
-                let trace = wiif_exog_1_correct
-                test_rules trace causal_rules []
-            else do
-                let trace = wiif_exog_1_wrong
-                test_rules trace causal_rules []
+            run_tests
         _ -> do
             putStrLn $ "Usage: wiif <trace-file> <target-file>"
 
 
+-- Should fail (?), rule broken
+test_1 :: IO ()
+test_1 = do
+    let trace = wiif_predict_1
+    let crs = [causal_rule_predict_1_1]
+    let ars = [] --[arrow_rule_predict_1_1]
+    let xrs = []
+    test_rules trace crs ars xrs
+
+-- Should pass
+test_2 :: IO ()
+test_2 = do
+    let trace = wiif_predict_1
+    let crs = [causal_rule_predict_1_2]
+    let ars = [] --[arrow_rule_predict_1_2]
+    let xrs = []
+    test_rules trace crs ars xrs
+
+-- Exo rules -- bad trace
+test_3 :: IO ()
+test_3 = do
+    let trace = wiif_exog_1_wrong
+    let crs = [causal_rule_exog_1_2]
+    test_rules trace crs [] []
+
+-- Exo rules -- right trace
+test_4 :: IO ()
+test_4 = do
+    let trace = wiif_exog_1_correct
+    let crs = [causal_rule_exog_1_2]
+    test_rules trace crs [] []
+
+-- Exo rules -- right trace, var mismatch
+test_5 :: IO ()
+test_5 = do
+    let trace = wiif_exog_1_correct
+    let crs = [causal_rule_exog_1_1]
+    test_rules trace crs [] []
+
+test_rules :: Trace -> [CausalRule] -> [ArrowRule] -> [XOrRule] -> IO ()
+test_rules t cs as xs = do
+    putStrLn $ "Running test ...\n"
+    check_causal_rules t cs
+    check_arrow_rules t as
+    check_xor_rules t xs
+    putStrLn $ "=============\n"
+
 test_causal_rules :: Trace -> [CausalRule] -> IO ()
 test_causal_rules t cs =
-    -- if causal_rules_valid t cs then
-    --     putStrLn $ "Causal rules valid"
-    -- else putStrLn $ "Causal rules invalid"
     check_causal_rules t cs
 
 test_arrow_rules :: Trace -> [ArrowRule] -> IO ()
 test_arrow_rules t as =
     check_arrow_rules t as
 
-test_rules :: Trace -> [CausalRule] -> [ArrowRule] -> IO ()
-test_rules t cs as =
-    test_causal_rules t cs >>
-    test_arrow_rules t as
+test_xor_rules :: Trace -> [XOrRule] -> IO ()
+test_xor_rules t xs =
+    check_xor_rules t xs
+
+run_tests :: IO ()
+run_tests =
+    test_1 >> test_2 >> test_3 >>
+    test_4 >> test_5
