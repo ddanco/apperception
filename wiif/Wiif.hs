@@ -198,6 +198,13 @@ test_5 = do
 test_rules :: Trace -> [CausalRule] -> [ArrowRule] -> [XOrRule] -> IO ()
 test_rules t cs as xs = do
     putStrLn $ "Running test ...\n"
+    putStrLn $ "Trace:\n"
+    print_trace t
+    -- putStrLn $ "\n Rules:\n"
+    -- mapM_ (\x -> print_causal_rule x) cs
+    -- mapM_ (\x -> print_arrow_rule x) as
+    -- mapM_ (\x -> print_xor_rule x) xs
+    putStrLn $ "\nResults:\n"
     check_causal_rules t cs
     check_arrow_rules t as
     check_xor_rules t xs
@@ -218,4 +225,4 @@ test_xor_rules t xs =
 run_tests :: IO ()
 run_tests =
     test_1 >> test_2 >> test_3 >>
-    test_4 >> test_5
+    test_4 -- >> test_5 -- TODO: Update args for var tests

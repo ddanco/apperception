@@ -8,6 +8,10 @@ import qualified Data.List as List
 
 type Trace = [TimeStep]
 
+print_trace :: Trace -> IO ()
+print_trace t =
+    mapM_ (\x -> print_time_step x) t
+
 type Sensor = String -- Maybe overkill.
 
 data TimeStep = TimeStep {
@@ -15,10 +19,23 @@ data TimeStep = TimeStep {
     readings :: [Reading]
 } deriving (Eq, Show)
 
+print_time_step :: TimeStep -> IO ()
+print_time_step t = do
+    putStrLn $ "Time : " ++ (show (time t)) ++
+                "      Readings : " ++
+                (List.intercalate "  " (print_readings (readings t)))
+
 data Reading =  Reading {
     sensor :: String,
     value :: String
 } deriving (Eq, Show)
+
+print_readings :: [Reading] -> [String]
+print_readings [] = []
+print_readings (x:xs) = ((print_reading x):(print_readings xs))
+
+print_reading :: Reading -> String
+print_reading r = (show (sensor r)) ++ "(" ++ (show (value r)) ++ ")"
 
 -- FIXME: Determine if this is correct datatype...handle vars correctly.
 data CausalRule = CausalRule {
