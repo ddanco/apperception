@@ -228,17 +228,17 @@ wiif_exog_1_correct = [
     }
     ]
 
--- causal_rule_predict_1_1 :: CausalRule
--- causal_rule_predict_1_1 = CausalRule {
---     start = "on",
---     end = "on"
--- }
+causal_rule_predict_1_1 :: CausalRule
+causal_rule_predict_1_1 = CausalRule {
+    start = Reading {sensor="light", value="on"},
+    end = Reading {sensor="light", value="on"}
+}
 
--- causal_rule_predict_1_2 :: CausalRule
--- causal_rule_predict_1_2 = CausalRule {
---     start = "on",
---     end = "off"
--- }
+causal_rule_predict_1_2 :: CausalRule
+causal_rule_predict_1_2 = CausalRule {
+    start = Reading {sensor="light", value="on"},
+    end = Reading {sensor="light", value="off"}
+}
 
 arrow_rule_predict_1_1 :: ArrowRule
 arrow_rule_predict_1_1 = ArrowRule {
@@ -297,26 +297,29 @@ type Sensor = String -- Maybe overkill.
 -- -- For now, for simplicity, yes.
 -- causal_rule_valid _ _ = True
 
--- s_causal_rule_valid :: Trace -> CausalRule -> IO ()
--- s_causal_rule_valid (x:(y:ys)) r =
---     case relevant_sensor (readings x) r of
---         Just v -> do
---             if not (causal_step_valid r v y) then putStrLn $ "NOT VALID: " ++ (show r) ++ " between timesteps\n" ++ (show x) ++ "\n and\n" ++ (show y)
---             else s_causal_rule_valid (y:ys) r
---         Nothing -> s_causal_rule_valid (y:ys) r
--- -- Do we want a trace of len 1 to pass a causal rule? Loop around?
--- -- For now, for simplicity, yes.
--- s_causal_rule_valid _ _ = putStrLn $ "done.."
+-----------------------------------------------------------
+------------------- Reporting options ---------------------
+-----------------------------------------------------------
 
--- s_causal_rules_valid :: Trace -> [CausalRule] -> IO ()
--- s_causal_rules_valid t [] = putStrLn $ "Done"
--- s_causal_rules_valid t (x:xs) = s_causal_rule_valid t x >>
---                                     s_causal_rules_valid t xs
+check_causal_rule :: Trace -> CausalRule -> IO ()
+check_causal_rule (x:(y:ys)) r =
+    if (start r) `elem` (readings x) then
+        if not ((end r) `elem` (readings y)) then
+            putStrLn $ "NOT VALID: " ++ (show r) ++ " between timesteps " ++ (show (time x)) ++ " and " ++ (show (time y))
+        else check_causal_rule (y:ys) r
+    else check_causal_rule (y:ys) r
+-- Do we want a trace of len 1 to pass a causal rule? Loop around?
+-- For now, for simplicity, yes.
+check_causal_rule _ _ = putStrLn $ "done.."
 
-causal_rules_valid :: Trace -> [CausalRule] -> Bool
-causal_rules_valid t [] = True
-causal_rules_valid t (x:xs) = causal_rule_valid_2 t x &&
-                                causal_rules_valid t xs
+check_causal_rules :: Trace -> [CausalRule] -> IO ()
+check_causal_rules t [] = putStrLn $ "Done"
+check_causal_rules t (x:xs) = check_causal_rule t x >>
+                                    check_causal_rules t xs
+
+-----------------------------------------------------------
+--------------------- Boolean options ---------------------
+-----------------------------------------------------------
 
 arrow_rule_valid :: Trace -> ArrowRule -> Bool
 arrow_rule_valid [] _ = True
@@ -330,15 +333,21 @@ arrow_rules_valid t [] = True
 arrow_rules_valid t (x:xs) = arrow_rule_valid t x &&
                                 arrow_rules_valid t xs
 
-causal_rule_valid_2 :: Trace -> CausalRule -> Bool
-causal_rule_valid_2 (x:(y:ys)) r =
-    if (start r) `elem` (readings x) then
-        (end r) `elem` (readings y) && causal_rule_valid_2 (y:ys) r
-    else causal_rule_valid_2 ys r
+causal_rules_valid :: Trace -> [CausalRule] -> Bool
+causal_rules_valid t [] = True
+causal_rules_valid t (x:xs) = causal_rule_valid t x &&
+                                causal_rules_valid t xs
 
------------------------------------------------
---------- Can't get Rule type properly working
------------------------------------------------
+causal_rule_valid :: Trace -> CausalRule -> Bool
+causal_rule_valid (x:(y:ys)) r =
+    if (start r) `elem` (readings x) then
+        (end r) `elem` (readings y) && causal_rule_valid (y:ys) r
+    else causal_rule_valid (y:ys) r
+
+
+-----------------------------------------------------------
+--------- Can't get Rule type properly working ------------
+-----------------------------------------------------------
 
 -- rules_valid :: Trace -> [Rule] -> Bool
 -- rules_valid _ [] = True
@@ -355,6 +364,7 @@ main :: IO ()
 main = do
     args <- getArgs
     case args of
+        -- verbosity argument?
         [trace, target] -> do
             -- contents <- readFile trace
             -- putStrLn $ contents
@@ -382,10 +392,10 @@ main = do
 
 test_causal_rules :: Trace -> [CausalRule] -> IO ()
 test_causal_rules t cs =
-    if causal_rules_valid t cs then
-        putStrLn $ "Causal rules valid"
-    else putStrLn $ "Causal rules invalid"
-    -- s_causal_rules_valid t cs
+    -- if causal_rules_valid t cs then
+    --     putStrLn $ "Causal rules valid"
+    -- else putStrLn $ "Causal rules invalid"
+    check_causal_rules t cs
 
 test_arrow_rules :: Trace -> [ArrowRule] -> IO ()
 test_arrow_rules t as =
