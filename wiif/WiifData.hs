@@ -1,9 +1,14 @@
 module WiifData where
 
+import qualified Data.List as List
+
 -----------------------------------------------------------
 -------------------------- Types --------------------------
 -----------------------------------------------------------
+
 type Trace = [TimeStep]
+
+type Sensor = String -- Maybe overkill.
 
 data TimeStep = TimeStep {
     time :: Int,
@@ -38,7 +43,13 @@ print_arrow_rule r = (show (premises r)) ++ " -> " ++ (show (conclusion r))
 -- data Rule = CausalRule String String |
 --             ArrowRule [String] String deriving (Eq, Show)
 
-type Sensor = String -- Maybe overkill.
+data XOrRule = XOrRule {
+    -- More elaborate type?
+    values :: [String]
+}
+
+print_xor_rule :: XOrRule -> String
+print_xor_rule r = List.intercalate "+" (values r)
 
 -----------------------------------------------------------
 -------------------------- Data ---------------------------

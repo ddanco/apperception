@@ -1,5 +1,7 @@
 module Main where
 
+import qualified Data.Set as Set
+
 import System.Environment
 import System.IO
 -- import Text.JSON.Generic
@@ -31,7 +33,7 @@ check_arrow_rule :: Trace -> ArrowRule -> IO ()
 check_arrow_rule (x:xs) r =
     if all (`elem` (readings x)) (premises r) then
         if not ((conclusion r) `elem` (readings x)) then
-            putStrLn $ " # RULE INVALID: " ++ (print_arrow_rule r) ++
+            putStrLn $ "# RULE INVALID: " ++ (print_arrow_rule r) ++
                         " at timestep " ++ (show (time x))
         else check_arrow_rule xs r
     else check_arrow_rule xs r
@@ -42,7 +44,31 @@ check_arrow_rule _ r = putStrLn $ "Rule valid: " ++ (print_arrow_rule r)
 check_arrow_rules :: Trace -> [ArrowRule] -> IO ()
 check_arrow_rules t [] = putStrLn $ ""
 check_arrow_rules t (x:xs) = check_arrow_rule t x >>
-                                    check_arrow_rules t xs
+                                check_arrow_rules t xs
+
+has_duplicates :: (Ord a) => [a] -> Bool
+has_duplicates list = length list /= length set
+  where set = Set.fromList list
+
+xor_step_valid :: [Reading] -> XOrRule -> Bool
+xor_step_valid xs r =
+    let rel_readings = filter (\x -> (value x) `elem` (values r)) xs in
+        let sensors = [(sensor r) | r <- rel_readings] in
+            not (has_duplicates sensors)
+
+check_xor_rule :: Trace -> XOrRule -> IO ()
+check_xor_rule [] r = putStrLn $ "Constraint valid: " ++ (print_xor_rule r)
+check_xor_rule (x:xs) r =
+    if not (xor_step_valid (readings x) r) then
+        putStrLn $ "# CONSTRAINT INVALID: " ++ (print_xor_rule r) ++
+                    " at timestep " ++ (show (time x))
+    else check_xor_rule xs r
+    -- get all readings with xorxs. number of sensors = number of xssfd
+
+check_xor_rules :: Trace -> [XOrRule] -> IO ()
+check_xor_rules t [] = putStrLn $ ""
+check_xor_rules t (x:xs) = check_xor_rule t x >>
+                            check_xor_rules t xs
 
 -----------------------------------------------------------
 --------------------- Boolean options ---------------------
