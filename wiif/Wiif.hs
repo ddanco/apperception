@@ -256,10 +256,18 @@ arrow_rule_predict_1_2 = ArrowRule {
     conclusion = Reading {sensor="intensity", value="bright"}
 }
 
+-- Fails: variable name mismatch
 causal_rule_exog_1_1 :: CausalRule
 causal_rule_exog_1_1 = CausalRule {
     start = Reading {sensor="exog", value="c_bong"},
     end = Reading {sensor="obj_a", value="c_on"}
+}
+
+-- Passes with exog_1
+causal_rule_exog_1_2 :: CausalRule
+causal_rule_exog_1_2 = CausalRule {
+    start = Reading {sensor="exog", value="c_bong"},
+    end = Reading {sensor="obj_1", value="c_on"}
 }
 
 -- =====================================================
@@ -383,7 +391,7 @@ main = do
             --     let arrow_rules = [arrow_rule_predict_1_1]
             --     test_rules trace causal_rules arrow_rules
 
-            let causal_rules = [causal_rule_exog_1_1]
+            let causal_rules = [causal_rule_exog_1_2]
             if should_pass then do
                 let trace = wiif_exog_1_correct
                 test_rules trace causal_rules []
