@@ -1,6 +1,8 @@
 module WiifData where
 
-
+-----------------------------------------------------------
+-------------------------- Types --------------------------
+-----------------------------------------------------------
 type Trace = [TimeStep]
 
 data TimeStep = TimeStep {
@@ -32,7 +34,15 @@ print_arrow_rule :: ArrowRule -> String
 -- FIXME: Make pretty
 print_arrow_rule r = (show (premises r)) ++ " -> " ++ (show (conclusion r))
 
--- ========================= Data ======================
+-- data Rule = CausalRule | ArrowRule
+-- data Rule = CausalRule String String |
+--             ArrowRule [String] String deriving (Eq, Show)
+
+type Sensor = String -- Maybe overkill.
+
+-----------------------------------------------------------
+-------------------------- Data ---------------------------
+-----------------------------------------------------------
 
 wiif_predict_1 :: Trace
 wiif_predict_1 = [
@@ -269,42 +279,3 @@ causal_rule_exog_1_2 = CausalRule {
     start = Reading {sensor="exog", value="c_bong"},
     end = Reading {sensor="obj_1", value="c_on"}
 }
-
--- =====================================================
-
--- data Rule = CausalRule | ArrowRule
--- data Rule = CausalRule String String |
---             ArrowRule [String] String deriving (Eq, Show)
-
-type Sensor = String -- Maybe overkill.
-
--- relevant_reading :: [Reading] -> Sensor -> Maybe Reading
--- relevant_reading [] _ = Nothing
--- -- We only take the first reading that matches. There shouldn't be
--- -- multiple different readings for one sensor at same timestamp.
--- -- Future: validate this in code.
--- relevant_reading (x:xs) v = if sensor x == v then Just x
---                             else relevant_reading xs v
-
--- relevant_sensor :: [Reading] -> CausalRule -> Maybe Sensor
--- relevant_sensor [] _ = Nothing
--- -- Same deal here, assuming there's only one reading for a given sensor.
--- -- Should do validation separately.
--- relevant_sensor (x:xs) r =  if value x == start r then Just (sensor x)
---                             else relevant_sensor xs r
-
--- causal_step_valid :: CausalRule -> Sensor -> TimeStep -> Bool
--- causal_step_valid rule v t =
---     case relevant_reading (readings t) v of
---         Just reading -> end rule == (value reading)
---         Nothing -> False
-
--- causal_rule_valid :: Trace -> CausalRule -> Bool
--- causal_rule_valid (x:(y:ys)) r =
---     case relevant_sensor (readings x) r of
---         Just v -> do
---             causal_step_valid r v y && causal_rule_valid (y:ys) r
---         Nothing -> causal_rule_valid (y:ys) r
--- -- Do we want a trace of len 1 to pass a causal rule? Loop around?
--- -- For now, for simplicity, yes.
--- causal_rule_valid _ _ = True

@@ -71,6 +71,38 @@ causal_rule_valid (x:(y:ys)) r =
         (end r) `elem` (readings y) && causal_rule_valid (y:ys) r
     else causal_rule_valid (y:ys) r
 
+
+-- relevant_reading :: [Reading] -> Sensor -> Maybe Reading
+-- relevant_reading [] _ = Nothing
+-- -- We only take the first reading that matches. There shouldn't be
+-- -- multiple different readings for one sensor at same timestamp.
+-- -- Future: validate this in code.
+-- relevant_reading (x:xs) v = if sensor x == v then Just x
+--                             else relevant_reading xs v
+
+-- relevant_sensor :: [Reading] -> CausalRule -> Maybe Sensor
+-- relevant_sensor [] _ = Nothing
+-- -- Same deal here, assuming there's only one reading for a given sensor.
+-- -- Should do validation separately.
+-- relevant_sensor (x:xs) r =  if value x == start r then Just (sensor x)
+--                             else relevant_sensor xs r
+
+-- causal_step_valid :: CausalRule -> Sensor -> TimeStep -> Bool
+-- causal_step_valid rule v t =
+--     case relevant_reading (readings t) v of
+--         Just reading -> end rule == (value reading)
+--         Nothing -> False
+
+-- causal_rule_valid :: Trace -> CausalRule -> Bool
+-- causal_rule_valid (x:(y:ys)) r =
+--     case relevant_sensor (readings x) r of
+--         Just v -> do
+--             causal_step_valid r v y && causal_rule_valid (y:ys) r
+--         Nothing -> causal_rule_valid (y:ys) r
+-- -- Do we want a trace of len 1 to pass a causal rule? Loop around?
+-- -- For now, for simplicity, yes.
+-- causal_rule_valid _ _ = True
+
 -- -- Can't get Rule type properly working
 -- rules_valid :: Trace -> [Rule] -> Bool
 -- rules_valid _ [] = True
