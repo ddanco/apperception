@@ -52,6 +52,9 @@ hasDuplicates list = length list /= length set
 
 xorStepValid :: [Reading] -> XOrRule -> Bool
 xorStepValid xs r =
+    -- FIXME: This will also fail if a sensor is given the same reading
+    -- twice in the same timestamp. I don't see why this should happen
+    -- anyways, but it shouldn't fail.
     let relReadings = filter (\x -> (value x) `elem` (values r)) xs in
         let sensors = [(sensor r) | r <- relReadings] in
             not (hasDuplicates sensors)
@@ -63,7 +66,6 @@ checkXorRule (x:xs) r =
         putStrLn $ "# CONSTRAINT INVALID: " ++ (printXorRule r) ++
                     " at timestep " ++ (show (time x))
     else checkXorRule xs r
-    -- get all readings with xorxs. number of sensors = number of xssfd
 
 checkXorRules :: Trace -> [XOrRule] -> IO ()
 checkXorRules t [] = putStrLn $ ""
