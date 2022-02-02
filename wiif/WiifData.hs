@@ -54,10 +54,6 @@ arrowRuleString :: ArrowRule -> String
 -- FIXME: Make pretty
 arrowRuleString r = (show (premises r)) ++ " -> " ++ (show (conclusion r))
 
--- data Rule = CausalRule | ArrowRule
--- data Rule = CausalRule String String |
---             ArrowRule [String] String deriving (Eq, Show)
-
 data XOrConstraint = XOrConstraint {
     -- More elaborate type?
     values :: [String]
