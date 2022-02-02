@@ -12,8 +12,6 @@ printTrace :: Trace -> IO ()
 printTrace t =
     mapM_ (\x -> printTimeStep x) t
 
-type Sensor = String -- Maybe overkill.
-
 data TimeStep = TimeStep {
     time :: Int,
     readings :: [Reading]
@@ -23,19 +21,19 @@ printTimeStep :: TimeStep -> IO ()
 printTimeStep t = do
     putStrLn $ "Time : " ++ (show (time t)) ++
                 "      Readings : " ++
-                (List.intercalate "  " (printReadings (readings t)))
+                (List.intercalate "  " (readingsString (readings t)))
 
 data Reading =  Reading {
     sensor :: String,
     value :: String
 } deriving (Eq, Show)
 
-printReadings :: [Reading] -> [String]
-printReadings [] = []
-printReadings (x:xs) = ((printReading x):(printReadings xs))
+readingsString :: [Reading] -> [String]
+readingsString [] = []
+readingsString (x:xs) = ((readingString x):(readingsString xs))
 
-printReading :: Reading -> String
-printReading r = (show (sensor r)) ++ "(" ++ (show (value r)) ++ ")"
+readingString :: Reading -> String
+readingString r = (show (sensor r)) ++ "(" ++ (show (value r)) ++ ")"
 
 -- FIXME: Determine if this is correct datatype...handle vars correctly.
 data CausalRule = CausalRule {
@@ -43,8 +41,8 @@ data CausalRule = CausalRule {
     end :: Reading
 } deriving (Eq, Show)
 
-printCausalRule :: CausalRule -> String
-printCausalRule r = "s(" ++ (show (value (start r))) ++ ",var x) >> " ++
+causalRuleString :: CausalRule -> String
+causalRuleString r = "s(" ++ (show (value (start r))) ++ ",var x) >> " ++
                         "s(" ++ (show (value (end r))) ++ ",var x)"
 
 data ArrowRule = ArrowRule {
@@ -52,21 +50,21 @@ data ArrowRule = ArrowRule {
     conclusion :: Reading
 }
 
-printArrowRule :: ArrowRule -> String
+arrowRuleString :: ArrowRule -> String
 -- FIXME: Make pretty
-printArrowRule r = (show (premises r)) ++ " -> " ++ (show (conclusion r))
+arrowRuleString r = (show (premises r)) ++ " -> " ++ (show (conclusion r))
 
 -- data Rule = CausalRule | ArrowRule
 -- data Rule = CausalRule String String |
 --             ArrowRule [String] String deriving (Eq, Show)
 
-data XOrRule = XOrRule {
+data XOrConstraint = XOrConstraint {
     -- More elaborate type?
     values :: [String]
 }
 
-printXorRule :: XOrRule -> String
-printXorRule r = List.intercalate "+" (values r)
+xorString :: XOrConstraint -> String
+xorString r = List.intercalate "+" (values r)
 
 -----------------------------------------------------------
 -------------------------- Data ---------------------------

@@ -8,21 +8,21 @@ import System.IO
 import WiifData
 
 -----------------------------------------------------------
-------------------- Reporting options ---------------------
+--------------- Rule/constraints checking -----------------
 -----------------------------------------------------------
 
 checkCausalRule :: Trace -> CausalRule -> IO ()
 checkCausalRule (x:(y:ys)) r =
     if (start r) `elem` (readings x) then
         if not ((end r) `elem` (readings y)) then
-            putStrLn $ "# RULE INVALID: " ++ (printCausalRule r) ++
+            putStrLn $ "# RULE INVALID: " ++ (causalRuleString r) ++
                         " between timesteps " ++ (show (time x)) ++
                         " and " ++ (show (time y))
         else checkCausalRule (y:ys) r
     else checkCausalRule (y:ys) r
 -- Do we want a trace of len 1 to pass a causal rule? Loop around?
 -- For now, for simplicity, yes.
-checkCausalRule _ r = putStrLn $ "Rule valid: " ++ (printCausalRule r)
+checkCausalRule _ r = putStrLn $ "Rule valid: " ++ (causalRuleString r)
 
 checkCausalRules :: Trace -> [CausalRule] -> IO ()
 checkCausalRules t [] = putStrLn $ ""
@@ -33,13 +33,11 @@ checkArrowRule :: Trace -> ArrowRule -> IO ()
 checkArrowRule (x:xs) r =
     if all (`elem` (readings x)) (premises r) then
         if not ((conclusion r) `elem` (readings x)) then
-            putStrLn $ "# RULE INVALID: " ++ (printArrowRule r) ++
+            putStrLn $ "# RULE INVALID: " ++ (arrowRuleString r) ++
                         " at timestep " ++ (show (time x))
         else checkArrowRule xs r
     else checkArrowRule xs r
--- Do we want a trace of len 1 to pass a causal rule? Loop around?
--- For now, for simplicity, yes.
-checkArrowRule _ r = putStrLn $ "Rule valid: " ++ (printArrowRule r)
+checkArrowRule _ r = putStrLn $ "Rule valid: " ++ (arrowRuleString r)
 
 checkArrowRules :: Trace -> [ArrowRule] -> IO ()
 checkArrowRules t [] = putStrLn $ ""
@@ -50,7 +48,7 @@ hasDuplicates :: (Ord a) => [a] -> Bool
 hasDuplicates list = length list /= length set
   where set = Set.fromList list
 
-xorStepValid :: [Reading] -> XOrRule -> Bool
+xorStepValid :: [Reading] -> XOrConstraint -> Bool
 xorStepValid xs r =
     -- FIXME: This will also fail if a sensor is given the same reading
     -- twice in the same timestamp. I don't see why this should happen
@@ -59,22 +57,22 @@ xorStepValid xs r =
         let sensors = [(sensor r) | r <- relReadings] in
             not (hasDuplicates sensors)
 
-checkXorRule :: Trace -> XOrRule -> IO ()
-checkXorRule [] r = putStrLn $ "Constraint valid: " ++ (printXorRule r)
-checkXorRule (x:xs) r =
+checkXOr :: Trace -> XOrConstraint -> IO ()
+checkXOr [] r = putStrLn $ "Constraint valid: " ++ (xorString r)
+checkXOr (x:xs) r =
     if not (xorStepValid (readings x) r) then
-        putStrLn $ "# CONSTRAINT INVALID: " ++ (printXorRule r) ++
+        putStrLn $ "# CONSTRAINT INVALID: " ++ (xorString r) ++
                     " at timestep " ++ (show (time x))
-    else checkXorRule xs r
+    else checkXOr xs r
 
-checkXorRules :: Trace -> [XOrRule] -> IO ()
-checkXorRules t [] = putStrLn $ ""
-checkXorRules t (x:xs) = checkXorRule t x >>
-                            checkXorRules t xs
+checkXOrs :: Trace -> [XOrConstraint] -> IO ()
+checkXOrs t [] = putStrLn $ ""
+checkXOrs t (x:xs) = checkXOr t x >>
+                            checkXOrs t xs
 
-
------------------------ Main --------------------------
-
+-----------------------------------------------------------
+------------------------- Main ----------------------------
+-----------------------------------------------------------
 
 main :: IO ()
 main = do
@@ -88,6 +86,10 @@ main = do
             runTests
         _ -> do
             putStrLn $ "Usage: wiif <trace-file> <target-file>"
+
+-----------------------------------------------------------
+------------------------- Tests ---------------------------
+-----------------------------------------------------------
 
 
 -- Should fail (?), rule broken
@@ -129,7 +131,7 @@ test_5 = do
     let crs = [causal_rule_exog_1_1]
     testRules trace crs [] []
 
-testRules :: Trace -> [CausalRule] -> [ArrowRule] -> [XOrRule] -> IO ()
+testRules :: Trace -> [CausalRule] -> [ArrowRule] -> [XOrConstraint] -> IO ()
 testRules t cs as xs = do
     putStrLn $ "Running test ...\n"
     putStrLn $ "Trace:\n"
@@ -141,7 +143,7 @@ testRules t cs as xs = do
     putStrLn $ "\nResults:\n"
     checkCausalRules t cs
     checkArrowRules t as
-    checkXorRules t xs
+    checkXOrs t xs
     putStrLn $ "=============\n"
 
 testCausalRules :: Trace -> [CausalRule] -> IO ()
@@ -152,9 +154,9 @@ testArrowRules :: Trace -> [ArrowRule] -> IO ()
 testArrowRules t as =
     checkArrowRules t as
 
-testXorRules :: Trace -> [XOrRule] -> IO ()
-testXorRules t xs =
-    checkXorRules t xs
+testXors :: Trace -> [XOrConstraint] -> IO ()
+testXors t xs =
+    checkXOrs t xs
 
 runTests :: IO ()
 runTests =
