@@ -11,91 +11,91 @@ import WiifData
 ------------------- Reporting options ---------------------
 -----------------------------------------------------------
 
-check_causal_rule :: Trace -> CausalRule -> IO ()
-check_causal_rule (x:(y:ys)) r =
+checkCausalRule :: Trace -> CausalRule -> IO ()
+checkCausalRule (x:(y:ys)) r =
     if (start r) `elem` (readings x) then
         if not ((end r) `elem` (readings y)) then
-            putStrLn $ "# RULE INVALID: " ++ (print_causal_rule r) ++
+            putStrLn $ "# RULE INVALID: " ++ (printCausalRule r) ++
                         " between timesteps " ++ (show (time x)) ++
                         " and " ++ (show (time y))
-        else check_causal_rule (y:ys) r
-    else check_causal_rule (y:ys) r
+        else checkCausalRule (y:ys) r
+    else checkCausalRule (y:ys) r
 -- Do we want a trace of len 1 to pass a causal rule? Loop around?
 -- For now, for simplicity, yes.
-check_causal_rule _ r = putStrLn $ "Rule valid: " ++ (print_causal_rule r)
+checkCausalRule _ r = putStrLn $ "Rule valid: " ++ (printCausalRule r)
 
-check_causal_rules :: Trace -> [CausalRule] -> IO ()
-check_causal_rules t [] = putStrLn $ ""
-check_causal_rules t (x:xs) = check_causal_rule t x >>
-                                    check_causal_rules t xs
+checkCausalRules :: Trace -> [CausalRule] -> IO ()
+checkCausalRules t [] = putStrLn $ ""
+checkCausalRules t (x:xs) = checkCausalRule t x >>
+                                    checkCausalRules t xs
 
-check_arrow_rule :: Trace -> ArrowRule -> IO ()
-check_arrow_rule (x:xs) r =
+checkArrowRule :: Trace -> ArrowRule -> IO ()
+checkArrowRule (x:xs) r =
     if all (`elem` (readings x)) (premises r) then
         if not ((conclusion r) `elem` (readings x)) then
-            putStrLn $ "# RULE INVALID: " ++ (print_arrow_rule r) ++
+            putStrLn $ "# RULE INVALID: " ++ (printArrowRule r) ++
                         " at timestep " ++ (show (time x))
-        else check_arrow_rule xs r
-    else check_arrow_rule xs r
+        else checkArrowRule xs r
+    else checkArrowRule xs r
 -- Do we want a trace of len 1 to pass a causal rule? Loop around?
 -- For now, for simplicity, yes.
-check_arrow_rule _ r = putStrLn $ "Rule valid: " ++ (print_arrow_rule r)
+checkArrowRule _ r = putStrLn $ "Rule valid: " ++ (printArrowRule r)
 
-check_arrow_rules :: Trace -> [ArrowRule] -> IO ()
-check_arrow_rules t [] = putStrLn $ ""
-check_arrow_rules t (x:xs) = check_arrow_rule t x >>
-                                check_arrow_rules t xs
+checkArrowRules :: Trace -> [ArrowRule] -> IO ()
+checkArrowRules t [] = putStrLn $ ""
+checkArrowRules t (x:xs) = checkArrowRule t x >>
+                                checkArrowRules t xs
 
-has_duplicates :: (Ord a) => [a] -> Bool
-has_duplicates list = length list /= length set
+hasDuplicates :: (Ord a) => [a] -> Bool
+hasDuplicates list = length list /= length set
   where set = Set.fromList list
 
-xor_step_valid :: [Reading] -> XOrRule -> Bool
-xor_step_valid xs r =
-    let rel_readings = filter (\x -> (value x) `elem` (values r)) xs in
-        let sensors = [(sensor r) | r <- rel_readings] in
-            not (has_duplicates sensors)
+xorStepValid :: [Reading] -> XOrRule -> Bool
+xorStepValid xs r =
+    let relReadings = filter (\x -> (value x) `elem` (values r)) xs in
+        let sensors = [(sensor r) | r <- relReadings] in
+            not (hasDuplicates sensors)
 
-check_xor_rule :: Trace -> XOrRule -> IO ()
-check_xor_rule [] r = putStrLn $ "Constraint valid: " ++ (print_xor_rule r)
-check_xor_rule (x:xs) r =
-    if not (xor_step_valid (readings x) r) then
-        putStrLn $ "# CONSTRAINT INVALID: " ++ (print_xor_rule r) ++
+checkXorRule :: Trace -> XOrRule -> IO ()
+checkXorRule [] r = putStrLn $ "Constraint valid: " ++ (printXorRule r)
+checkXorRule (x:xs) r =
+    if not (xorStepValid (readings x) r) then
+        putStrLn $ "# CONSTRAINT INVALID: " ++ (printXorRule r) ++
                     " at timestep " ++ (show (time x))
-    else check_xor_rule xs r
+    else checkXorRule xs r
     -- get all readings with xorxs. number of sensors = number of xssfd
 
-check_xor_rules :: Trace -> [XOrRule] -> IO ()
-check_xor_rules t [] = putStrLn $ ""
-check_xor_rules t (x:xs) = check_xor_rule t x >>
-                            check_xor_rules t xs
+checkXorRules :: Trace -> [XOrRule] -> IO ()
+checkXorRules t [] = putStrLn $ ""
+checkXorRules t (x:xs) = checkXorRule t x >>
+                            checkXorRules t xs
 
 -----------------------------------------------------------
 --------------------- Boolean options ---------------------
 -----------------------------------------------------------
 
-arrow_rule_valid :: Trace -> ArrowRule -> Bool
-arrow_rule_valid [] _ = True
-arrow_rule_valid (x:xs) r =
+arrowRuleValid :: Trace -> ArrowRule -> Bool
+arrowRuleValid [] _ = True
+arrowRuleValid (x:xs) r =
     if all (`elem` (readings x)) (premises r) then
-        (conclusion r) `elem` (readings x) && arrow_rule_valid xs r
-    else arrow_rule_valid xs r
+        (conclusion r) `elem` (readings x) && arrowRuleValid xs r
+    else arrowRuleValid xs r
 
-arrow_rules_valid :: Trace -> [ArrowRule] -> Bool
-arrow_rules_valid t [] = True
-arrow_rules_valid t (x:xs) = arrow_rule_valid t x &&
-                                arrow_rules_valid t xs
+arrowRulesValid :: Trace -> [ArrowRule] -> Bool
+arrowRulesValid t [] = True
+arrowRulesValid t (x:xs) = arrowRuleValid t x &&
+                                arrowRulesValid t xs
 
-causal_rules_valid :: Trace -> [CausalRule] -> Bool
-causal_rules_valid t [] = True
-causal_rules_valid t (x:xs) = causal_rule_valid t x &&
-                                causal_rules_valid t xs
+causalRulesValid :: Trace -> [CausalRule] -> Bool
+causalRulesValid t [] = True
+causalRulesValid t (x:xs) = causalRuleValid t x &&
+                                causalRulesValid t xs
 
-causal_rule_valid :: Trace -> CausalRule -> Bool
-causal_rule_valid (x:(y:ys)) r =
+causalRuleValid :: Trace -> CausalRule -> Bool
+causalRuleValid (x:(y:ys)) r =
     if (start r) `elem` (readings x) then
-        (end r) `elem` (readings y) && causal_rule_valid (y:ys) r
-    else causal_rule_valid (y:ys) r
+        (end r) `elem` (readings y) && causalRuleValid (y:ys) r
+    else causalRuleValid (y:ys) r
 
 
 -- relevant_reading :: [Reading] -> Sensor -> Maybe Reading
@@ -151,7 +151,7 @@ main = do
             -- TODO: Add file support
             -- contents <- readFile trace
             -- putStrLn $ contents
-            run_tests
+            runTests
         _ -> do
             putStrLn $ "Usage: wiif <trace-file> <target-file>"
 
@@ -163,7 +163,7 @@ test_1 = do
     let crs = [causal_rule_predict_1_1]
     let ars = [] --[arrow_rule_predict_1_1]
     let xrs = []
-    test_rules trace crs ars xrs
+    testRules trace crs ars xrs
 
 -- Should pass
 test_2 :: IO ()
@@ -172,57 +172,57 @@ test_2 = do
     let crs = [causal_rule_predict_1_2]
     let ars = [] --[arrow_rule_predict_1_2]
     let xrs = []
-    test_rules trace crs ars xrs
+    testRules trace crs ars xrs
 
 -- Exo rules -- bad trace
 test_3 :: IO ()
 test_3 = do
     let trace = wiif_exog_1_wrong
     let crs = [causal_rule_exog_1_2]
-    test_rules trace crs [] []
+    testRules trace crs [] []
 
 -- Exo rules -- right trace
 test_4 :: IO ()
 test_4 = do
     let trace = wiif_exog_1_correct
     let crs = [causal_rule_exog_1_2]
-    test_rules trace crs [] []
+    testRules trace crs [] []
 
 -- Exo rules -- right trace, var mismatch
 test_5 :: IO ()
 test_5 = do
     let trace = wiif_exog_1_correct
     let crs = [causal_rule_exog_1_1]
-    test_rules trace crs [] []
+    testRules trace crs [] []
 
-test_rules :: Trace -> [CausalRule] -> [ArrowRule] -> [XOrRule] -> IO ()
-test_rules t cs as xs = do
+testRules :: Trace -> [CausalRule] -> [ArrowRule] -> [XOrRule] -> IO ()
+testRules t cs as xs = do
     putStrLn $ "Running test ...\n"
     putStrLn $ "Trace:\n"
-    print_trace t
+    printTrace t
     -- putStrLn $ "\n Rules:\n"
     -- mapM_ (\x -> print_causal_rule x) cs
     -- mapM_ (\x -> print_arrow_rule x) as
     -- mapM_ (\x -> print_xor_rule x) xs
     putStrLn $ "\nResults:\n"
-    check_causal_rules t cs
-    check_arrow_rules t as
-    check_xor_rules t xs
+    checkCausalRules t cs
+    checkArrowRules t as
+    checkXorRules t xs
     putStrLn $ "=============\n"
 
-test_causal_rules :: Trace -> [CausalRule] -> IO ()
-test_causal_rules t cs =
-    check_causal_rules t cs
+testCausalRules :: Trace -> [CausalRule] -> IO ()
+testCausalRules t cs =
+    checkCausalRules t cs
 
-test_arrow_rules :: Trace -> [ArrowRule] -> IO ()
-test_arrow_rules t as =
-    check_arrow_rules t as
+testArrowRules :: Trace -> [ArrowRule] -> IO ()
+testArrowRules t as =
+    checkArrowRules t as
 
-test_xor_rules :: Trace -> [XOrRule] -> IO ()
-test_xor_rules t xs =
-    check_xor_rules t xs
+testXorRules :: Trace -> [XOrRule] -> IO ()
+testXorRules t xs =
+    checkXorRules t xs
 
-run_tests :: IO ()
-run_tests =
+runTests :: IO ()
+runTests =
     test_1 >> test_2 >> test_3 >>
     test_4 -- >> test_5 -- TODO: Update args for var tests

@@ -8,9 +8,9 @@ import qualified Data.List as List
 
 type Trace = [TimeStep]
 
-print_trace :: Trace -> IO ()
-print_trace t =
-    mapM_ (\x -> print_time_step x) t
+printTrace :: Trace -> IO ()
+printTrace t =
+    mapM_ (\x -> printTimeStep x) t
 
 type Sensor = String -- Maybe overkill.
 
@@ -19,23 +19,23 @@ data TimeStep = TimeStep {
     readings :: [Reading]
 } deriving (Eq, Show)
 
-print_time_step :: TimeStep -> IO ()
-print_time_step t = do
+printTimeStep :: TimeStep -> IO ()
+printTimeStep t = do
     putStrLn $ "Time : " ++ (show (time t)) ++
                 "      Readings : " ++
-                (List.intercalate "  " (print_readings (readings t)))
+                (List.intercalate "  " (printReadings (readings t)))
 
 data Reading =  Reading {
     sensor :: String,
     value :: String
 } deriving (Eq, Show)
 
-print_readings :: [Reading] -> [String]
-print_readings [] = []
-print_readings (x:xs) = ((print_reading x):(print_readings xs))
+printReadings :: [Reading] -> [String]
+printReadings [] = []
+printReadings (x:xs) = ((printReading x):(printReadings xs))
 
-print_reading :: Reading -> String
-print_reading r = (show (sensor r)) ++ "(" ++ (show (value r)) ++ ")"
+printReading :: Reading -> String
+printReading r = (show (sensor r)) ++ "(" ++ (show (value r)) ++ ")"
 
 -- FIXME: Determine if this is correct datatype...handle vars correctly.
 data CausalRule = CausalRule {
@@ -43,8 +43,8 @@ data CausalRule = CausalRule {
     end :: Reading
 } deriving (Eq, Show)
 
-print_causal_rule :: CausalRule -> String
-print_causal_rule r = "s(" ++ (show (value (start r))) ++ ",var x) >> " ++
+printCausalRule :: CausalRule -> String
+printCausalRule r = "s(" ++ (show (value (start r))) ++ ",var x) >> " ++
                         "s(" ++ (show (value (end r))) ++ ",var x)"
 
 data ArrowRule = ArrowRule {
@@ -52,9 +52,9 @@ data ArrowRule = ArrowRule {
     conclusion :: Reading
 }
 
-print_arrow_rule :: ArrowRule -> String
+printArrowRule :: ArrowRule -> String
 -- FIXME: Make pretty
-print_arrow_rule r = (show (premises r)) ++ " -> " ++ (show (conclusion r))
+printArrowRule r = (show (premises r)) ++ " -> " ++ (show (conclusion r))
 
 -- data Rule = CausalRule | ArrowRule
 -- data Rule = CausalRule String String |
@@ -65,8 +65,8 @@ data XOrRule = XOrRule {
     values :: [String]
 }
 
-print_xor_rule :: XOrRule -> String
-print_xor_rule r = List.intercalate "+" (values r)
+printXorRule :: XOrRule -> String
+printXorRule r = List.intercalate "+" (values r)
 
 -----------------------------------------------------------
 -------------------------- Data ---------------------------
