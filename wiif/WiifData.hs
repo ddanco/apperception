@@ -6,6 +6,10 @@ import qualified Data.List as List
 -------------------------- Types --------------------------
 -----------------------------------------------------------
 
+-- Rule types are more built out than Interpretation.hs.
+-- There, the atoms are just strings, and we need easier-to-handle
+-- datatypes to be able to judge validity of the rules.
+
 type Trace = [TimeStep]
 
 printTrace :: Trace -> IO ()
