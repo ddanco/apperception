@@ -1,4 +1,4 @@
-module WiifData where
+module DebuggerData where
 
 import qualified Data.List as List
 

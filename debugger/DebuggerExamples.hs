@@ -1,13 +1,13 @@
-module WiifExamples where
+module DebuggerExamples where
 
-import WiifData
+import DebuggerData
 
 -----------------------------------------------------------
 ------------------------ Examples -------------------------
 -----------------------------------------------------------
 
-wiif_predict_1 :: Trace
-wiif_predict_1 = [
+debug_predict_1 :: Trace
+debug_predict_1 = [
     TimeStep {
         time = 1,
         readings = [Reading {sensor="light", value="on"},
@@ -36,8 +36,8 @@ wiif_predict_1 = [
         readings = [Reading {sensor="light", value="off"}]
     }]
 
-wiif_exog_1_wrong :: Trace
-wiif_exog_1_wrong = [
+debug_exog_1_wrong :: Trace
+debug_exog_1_wrong = [
     TimeStep {
         time = 1,
         readings = [Reading {sensor="obj_1", value="c_off"},
@@ -120,8 +120,8 @@ wiif_exog_1_wrong = [
     }
     ]
 
-wiif_exog_1_correct :: Trace
-wiif_exog_1_correct = [
+debug_exog_1_correct :: Trace
+debug_exog_1_correct = [
     TimeStep {
         time = 1,
         readings = [Reading {sensor="obj_1", value="c_off"},

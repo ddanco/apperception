@@ -5,8 +5,8 @@ import qualified Data.Set as Set
 import System.Environment
 import System.IO
 -- import Text.JSON.Generic
-import WiifData
-import WiifExamples
+import DebuggerData
+import DebuggerExamples
 
 -----------------------------------------------------------
 --------------- Rule/constraints checking -----------------
@@ -86,7 +86,7 @@ main = do
             -- putStrLn $ contents
             runTests
         _ -> do
-            putStrLn $ "Usage: wiif <trace-file> <target-file>"
+            putStrLn $ "Usage: debug <trace-file> <target-file>"
 
 -----------------------------------------------------------
 ------------------------- Tests ---------------------------
@@ -96,7 +96,7 @@ main = do
 -- Should fail (?), rule broken
 test_1 :: IO ()
 test_1 = do
-    let trace = wiif_predict_1
+    let trace = debug_predict_1
     let crs = [causal_rule_predict_1_1]
     let ars = [] --[arrow_rule_predict_1_1]
     let xrs = []
@@ -105,7 +105,7 @@ test_1 = do
 -- Should pass
 test_2 :: IO ()
 test_2 = do
-    let trace = wiif_predict_1
+    let trace = debug_predict_1
     let crs = [causal_rule_predict_1_2]
     let ars = [] --[arrow_rule_predict_1_2]
     let xrs = []
@@ -114,21 +114,21 @@ test_2 = do
 -- Exo rules -- bad trace
 test_3 :: IO ()
 test_3 = do
-    let trace = wiif_exog_1_wrong
+    let trace = debug_exog_1_wrong
     let crs = [causal_rule_exog_1_2]
     testRules trace crs [] []
 
 -- Exo rules -- right trace
 test_4 :: IO ()
 test_4 = do
-    let trace = wiif_exog_1_correct
+    let trace = debug_exog_1_correct
     let crs = [causal_rule_exog_1_2]
     testRules trace crs [] []
 
 -- Exo rules -- right trace, var mismatch
 test_5 :: IO ()
 test_5 = do
-    let trace = wiif_exog_1_correct
+    let trace = debug_exog_1_correct
     let crs = [causal_rule_exog_1_1]
     testRules trace crs [] []
 
