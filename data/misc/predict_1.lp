@@ -12,6 +12,11 @@
 %   4               off      
 %   5               on       
 %   6               off      
+%   7               on       
+%   8               off      
+%   9               off       
+%   10              on       
+%   11              off  
 %----------------------------
 
 % The given sequence

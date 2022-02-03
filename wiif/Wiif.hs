@@ -6,6 +6,7 @@ import System.Environment
 import System.IO
 -- import Text.JSON.Generic
 import WiifData
+import WiifExamples
 
 -----------------------------------------------------------
 --------------- Rule/constraints checking -----------------
