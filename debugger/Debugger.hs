@@ -83,7 +83,7 @@ main = do
             runTests
         _ -> do
             -- TODO: Add file input support
-            error "Not implemented"
+            putStrLn $ "Usage: `Debugger tests`. File support not yet implemented."
 
 -----------------------------------------------------------
 ------------------------- Tests ---------------------------
