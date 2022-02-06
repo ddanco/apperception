@@ -241,3 +241,93 @@ causal_rule_exog_1_2 = CausalRule {
     start = Reading {sensor="exog", value="c_bong"},
     end = Reading {sensor="obj_1", value="c_on"}
 }
+
+-----------------------------------------------------------
+---------------------- Rhythm -----------------------------
+-----------------------------------------------------------
+
+debug_rhythm_correct :: Trace
+debug_rhythm_correct = [
+    TimeStep {
+        time = 1,
+        readings = [Reading {sensor="bass", value="3"},
+                    Reading {sensor="snare", value="0"},
+                    Reading {sensor="hihat", value="3"}]
+    },
+    TimeStep {
+        time = 2,
+        readings = [Reading {sensor="bass", value="2"},
+                    Reading {sensor="snare", value="0"},
+                    Reading {sensor="hihat", value="2"}]
+    },
+    TimeStep {
+        time = 3,
+        readings = [Reading {sensor="bass", value="1"},
+                    Reading {sensor="snare", value="0"},
+                    Reading {sensor="hihat", value="3"}]
+    },
+    TimeStep {
+        time = 4,
+        readings = [Reading {sensor="bass", value="0"},
+                    Reading {sensor="snare", value="0"},
+                    Reading {sensor="hihat", value="2"}]
+    },
+    TimeStep {
+        time = 5,
+        readings = [Reading {sensor="bass", value="3"},
+                    Reading {sensor="snare", value="3"},
+                    Reading {sensor="hihat", value="3"}]
+    }
+    ]
+
+debug_rhythm_incorrect :: Trace
+debug_rhythm_incorrect = [
+    TimeStep {
+        time = 1,
+        readings = [Reading {sensor="bass", value="3"},
+                    Reading {sensor="snare", value="0"},
+                    Reading {sensor="hihat", value="3"}]
+    },
+    TimeStep {
+        time = 2,
+        readings = [Reading {sensor="bass", value="2"},
+                    Reading {sensor="snare", value="0"},
+                    Reading {sensor="hihat", value="2"}]
+    },
+    TimeStep {
+        time = 3,
+        readings = [Reading {sensor="bass", value="1"},
+                    Reading {sensor="snare", value="0"},
+                    Reading {sensor="hihat", value="2"}]
+    },
+    TimeStep {
+        time = 4,
+        readings = [Reading {sensor="bass", value="0"},
+                    Reading {sensor="snare", value="0"},
+                    Reading {sensor="hihat", value="3"}]
+    },
+    TimeStep {
+        time = 5,
+        readings = [Reading {sensor="bass", value="3"},
+                    Reading {sensor="snare", value="3"},
+                    Reading {sensor="hihat", value="2"}]
+    }
+    ]
+
+causal_rule_rhythm_1_1 :: CausalRule2
+causal_rule_rhythm_1_1 = CausalRule2 {
+    start_cond = \x -> (sensor x) == "hihat" && (isntLoudest (value x)),
+    end_cond = \x -> (sensor x) == "hihat" && (isLoudest (value x))
+}
+
+-- Rule generated for predict_EighthNodeDrumBeat
+------------------------------------------------
+-- % s_hihat ^ succ(l, l2) ^ s_l_loud >> s_l2_loud
+-- % if hihat isnt the loudest, then next step it's the loudest
+-- r11 : isa(p_is_hi_hat,var_s) /\ isa2(p_succ,var_l,var_l2) /\ s2(c_loudness,var_s,var_l) >> s2(c_loudness, var_s, var_l2)
+
+isLoudest :: String -> Bool
+isLoudest s = (s == "3")
+
+isntLoudest :: String -> Bool
+isntLoudest s = not (isLoudest s)

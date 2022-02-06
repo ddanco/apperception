@@ -71,6 +71,30 @@ checkXOrs t [] = putStrLn $ ""
 checkXOrs t (x:xs) = checkXOr t x >>
                             checkXOrs t xs
 
+
+-----------------------------------------------------------
+------- Demonstation of 'complex' rules -------------------
+-------- (unrealistic for this setup) ---------------------
+-----------------------------------------------------------
+
+checkCausalRule2 :: Trace -> CausalRule2 -> IO ()
+checkCausalRule2 (x:(y:ys)) r =
+    if any (start_cond r) (readings x) then
+        if not (any (end_cond r) (readings y)) then
+            putStrLn $ "# RULE INVALID: " ++ --(show r) ++
+                        "between timesteps " ++ (show (time x)) ++
+                        " and " ++ (show (time y))
+        else checkCausalRule2 (y:ys) r
+    else checkCausalRule2 (y:ys) r
+-- Do we want a trace of len 1 to pass a causal rule? Loop around?
+-- For now, for simplicity, yes.
+checkCausalRule2 _ r = putStrLn $ "Rule valid." -- ++ (show r)
+
+checkCausalRules2 :: Trace -> [CausalRule2] -> IO ()
+checkCausalRules2 t [] = putStrLn $ ""
+checkCausalRules2 t (x:xs) = checkCausalRule2 t x >>
+                                    checkCausalRules2 t xs
+
 -----------------------------------------------------------
 ------------------------- Main ----------------------------
 -----------------------------------------------------------
@@ -128,6 +152,30 @@ test_5 = do
     let crs = [causal_rule_exog_1_1]
     testRules trace crs [] []
 
+-- Should fail
+test_complex_rule_1 :: IO ()
+test_complex_rule_1 = do
+    let trace = debug_rhythm_incorrect
+    let crs = [causal_rule_rhythm_1_1]
+    putStrLn $ "Running test ...\n"
+    putStrLn $ "Trace:\n"
+    printTrace trace
+    putStrLn $ "\nResults:\n"
+    checkCausalRules2 trace crs
+    putStrLn $ "=============\n"
+
+-- Should pass
+test_complex_rule_2 :: IO ()
+test_complex_rule_2 = do
+    let trace = debug_rhythm_correct
+    let crs = [causal_rule_rhythm_1_1]
+    putStrLn $ "Running test ...\n"
+    putStrLn $ "Trace:\n"
+    printTrace trace
+    putStrLn $ "\nResults:\n"
+    checkCausalRules2 trace crs
+    putStrLn $ "=============\n"
+
 testRules :: Trace -> [CausalRule] -> [ArrowRule] -> [XOrConstraint] -> IO ()
 testRules t cs as xs = do
     putStrLn $ "Running test ...\n"
@@ -159,3 +207,4 @@ runTests :: IO ()
 runTests =
     test_1 >> test_2 >> test_3 >>
     test_4 -- >> test_5 -- TODO: Update args for var tests
+    >> test_complex_rule_1 >> test_complex_rule_2

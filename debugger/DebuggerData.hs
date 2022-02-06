@@ -65,3 +65,13 @@ data XOrConstraint = XOrConstraint {
 
 xorString :: XOrConstraint -> String
 xorString r = List.intercalate "+" (values r)
+
+-----------------------------------------------------------
+------- Demonstation of 'complex' rules -------------------
+-------- (unrealistic for this setup) ---------------------
+-----------------------------------------------------------
+
+data CausalRule2 = CausalRule2 {
+    start_cond :: Reading -> Bool,
+    end_cond :: Reading -> Bool
+} -- deriving (Eq, Show)
