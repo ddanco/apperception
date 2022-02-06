@@ -79,19 +79,15 @@ main :: IO ()
 main = do
     args <- getArgs
     case args of
-        -- verbosity argument?
-        [trace, target] -> do
-            -- TODO: Add file support
-            -- contents <- readFile trace
-            -- putStrLn $ contents
+        ["tests"] -> do
             runTests
         _ -> do
-            putStrLn $ "Usage: debug <trace-file> <target-file>"
+            -- TODO: Add file input support
+            error "Not implemented"
 
 -----------------------------------------------------------
 ------------------------- Tests ---------------------------
 -----------------------------------------------------------
-
 
 -- Should fail (?), rule broken
 test_1 :: IO ()
